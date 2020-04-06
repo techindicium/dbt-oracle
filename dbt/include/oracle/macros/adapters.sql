@@ -50,9 +50,9 @@
 
   create {% if temporary: -%}temporary{%- endif %} table
     {{ relation.include(database=False, schema=(not temporary)) }}
-  as (
+  as 
     {{ sql }}
-  )
+  
 {% endmacro %}
 
 
@@ -89,7 +89,6 @@
 {% macro oracle__create_view_as(relation, sql) -%}
   {%- set sql_header = config.get('sql_header', none) -%}
   {{ sql_header if sql_header is not none }}
-  create view {{ relation.render() }} as (
-    {{ sql | replace(""+database+".", "")}}
-  )
+  create view {{ relation.render() }} as
+  {{ sql | replace(""+database+".", "")}}
 {% endmacro %}
