@@ -1,0 +1,19 @@
+name: dbt_project
+version: 1.0
+
+quoting:
+  database: false
+  identifier: false
+  schema: false
+
+seeds:
+    dbt_project:
+        seed:
+            column_types:
+                id: number(10,2)
+                first_name: varchar(250)
+                last_name: varchar(250)
+                email: varchar(250)
+                gender: varchar(250)
+                ip_address: varchar(250)
+                

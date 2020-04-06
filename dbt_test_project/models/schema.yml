@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: hr_database
+    schema: hr
+    tables:
+      - name: employees
+      - name: jobs
+
+models:
+  - name: table_relation
+    columns:
+      - name: id
+        tests:
+          - not_null
+          - unique

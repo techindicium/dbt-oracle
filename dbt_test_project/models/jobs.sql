@@ -1,0 +1,1 @@
+select * from {{ source('hr_database', 'employees') }}
