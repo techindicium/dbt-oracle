@@ -156,7 +156,6 @@ class OracleAdapterConnectionManager(SQLConnectionManager):
             pre = time.time()
 
             cursor = connection.handle.cursor()
-            logger.info(bindings)
             cursor.execute(sql, bindings)
 
             logger.debug(
