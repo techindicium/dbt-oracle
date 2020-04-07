@@ -47,7 +47,7 @@ class OracleAdapterConnectionManager(SQLConnectionManager):
     def open(cls, connection):
 
         if connection.state == 'open':
-            logger.info('Connection is already open, skipping open.')
+            logger.debug('Connection is already open, skipping open.')
             return connection
 
         credentials = cls.get_credentials(connection.credentials)
@@ -113,7 +113,6 @@ class OracleAdapterConnectionManager(SQLConnectionManager):
             raise dbt.exceptions.DatabaseException(str(e).strip()) from e
 
         except Exception as e:
-            logger.info("Error running SQL: {}", sql)
             logger.info("Rolling back transaction.")
             self.release()
             if isinstance(e, dbt.exceptions.RuntimeException):
@@ -135,7 +134,7 @@ class OracleAdapterConnectionManager(SQLConnectionManager):
         bindings: Optional[Any] = {},
         abridge_sql_log: bool = False
     ) -> Tuple[Connection, Any]:
-        logger.info(sql)
+        logger.debug(sql)
         connection = self.get_thread_connection()
         if auto_begin and connection.transaction_open is False:
             self.begin()
