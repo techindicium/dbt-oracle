@@ -51,7 +51,7 @@ class OracleAdapterConnectionManager(SQLConnectionManager):
             return connection
 
         credentials = cls.get_credentials(connection.credentials)
-        host = f'{credentials.host}/{credentials.database}'
+        host = f'{credentials.host}:{credentials.port}/{credentials.database}'
 
         try:
             handle = cx_Oracle.connect(
