@@ -15,12 +15,12 @@ requirements = [
         'cx_Oracle==7.3.0'
 ]
 
-setup_requirements = [ ]
+setup_requirements = []
 
-test_requirements = [ ]
+test_requirements = []
 
 setup(
-    author="Vitor Avancini",
+    author="Indicium Tech",
     author_email='vitor.avancini@indicium.tech',
     python_requires='>=3.5',
     classifiers=[
@@ -45,8 +45,8 @@ setup(
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
-    url='https://github.com/vitoravancini/dbt-oracle',
-    version='0.1.2',
+    url='https://github.com/techindicium/dbt-oracle',
+    version='0.1.3',
     zip_safe=False,
     package_data={
         'dbt': [
