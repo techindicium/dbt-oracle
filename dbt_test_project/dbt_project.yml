@@ -16,4 +16,29 @@ seeds:
                 email: varchar(250)
                 gender: varchar(250)
                 ip_address: varchar(250)
-                
+
+on-run-start:
+    # oracle elegant way of 'create if not exists'
+    - "
+    declare
+    nCount NUMBER;
+    v_sql LONG;
+
+    begin
+    SELECT count(*) into nCount FROM dba_tables where table_name = 'DBT_AUDIT';
+    IF(nCount <= 0)
+    THEN
+    v_sql:='
+    create table DBT_AUDIT
+    (
+    ID NUMBER(3),
+    NAME VARCHAR2(30) NOT NULL
+    )';
+    execute immediate v_sql;
+
+    END IF;
+    end;
+    "
+
+on-run-end:
+    - "insert into DBT_AUDIT(NAME) values('another run')"
