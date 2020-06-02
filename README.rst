@@ -13,13 +13,13 @@ You need the oracle database client installed in your system in order for this t
 
 here(https://cx-oracle.readthedocs.io/en/latest/user_guide/installation.html) you can find the cx_oracle python driver installation instructions.
 
-this(https://gist.github.com/tcnksm/7316877) gist is a useful resource for installing in ubuntu. It's an onld link for ubuntu 12 but it still works at least for ubuntu 18.
+this(https://gist.github.com/tcnksm/7316877) gist is a useful resource for installing in ubuntu. It's an old link for Ubuntu 12 but it still works at least for ubuntu 18.
 
 Installing:
 
 :: 
     
-    pip install dbt-oracle=0.1.1
+    pip install dbt-oracle=0.1.3
 
 
 
@@ -78,4 +78,4 @@ for running it against dbt-oracle adapter one can run:
 Final Notes
 -----------
 
-This is a new project and any contribuitions are wellcome.
+This is a new project and any contribuitions are welcome.
