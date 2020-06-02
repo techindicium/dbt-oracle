@@ -115,3 +115,7 @@ build/
 .egg-info/
 dist
 
+.user.yml
+
+
+dbt_integration_test

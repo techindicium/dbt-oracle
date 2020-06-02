@@ -134,7 +134,6 @@ class OracleAdapterConnectionManager(SQLConnectionManager):
         bindings: Optional[Any] = {},
         abridge_sql_log: bool = False
     ) -> Tuple[Connection, Any]:
-        logger.debug(sql)
         connection = self.get_thread_connection()
         if auto_begin and connection.transaction_open is False:
             self.begin()
@@ -157,7 +156,7 @@ class OracleAdapterConnectionManager(SQLConnectionManager):
 
             cursor = connection.handle.cursor()
             cursor.execute(sql, bindings)
-
+            connection.handle.commit()
             logger.debug(
                 "SQL status: {status} in {elapsed:0.2f} seconds",
                 status=self.get_status(cursor),
