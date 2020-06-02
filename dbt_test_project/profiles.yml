@@ -1,0 +1,12 @@
+dbt_oracle_test: 
+   target: dev
+   outputs:
+      dev:
+         type: oracle
+         host: localhost
+         user: system
+         pass: oracle
+         port: 1521
+         dbname: xe
+         schema: system
+         threads: 4

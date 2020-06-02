@@ -1,5 +1,6 @@
 name: dbt_project
 version: 1.0
+profile: dbt_oracle_test
 
 quoting:
   database: false
