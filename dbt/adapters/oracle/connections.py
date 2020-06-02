@@ -134,7 +134,6 @@ class OracleAdapterConnectionManager(SQLConnectionManager):
         bindings: Optional[Any] = {},
         abridge_sql_log: bool = False
     ) -> Tuple[Connection, Any]:
-        logger.debug(sql)
         connection = self.get_thread_connection()
         if auto_begin and connection.transaction_open is False:
             self.begin()

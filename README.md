@@ -1,2 +1,0 @@
-DBT plugin for oracle
-

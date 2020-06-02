@@ -1,4 +1,3 @@
-{{ config(quoting={database:False, schema:True, identifier:False}) }}
 select
-    name
+    "name"
 from {{ ref("lower")}}
