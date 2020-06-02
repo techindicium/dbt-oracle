@@ -6,8 +6,8 @@ Oracle DBT
 .. image:: https://img.shields.io/pypi/v/dbt-oracle.svg
         :target: https://pypi.python.org/pypi/dbt-oracle
 
-
-### Installation
+Installation
+************
 
 You need the oracle database client installed in your system in order for this to work,
 
@@ -17,38 +17,44 @@ this(https://gist.github.com/tcnksm/7316877) gist is a useful resource for insta
 
 Installing:
 
-.. code-block:: bash
-        pip install dbt-oracle=0.1.1
+:: 
+    
+    pip install dbt-oracle=0.1.1
 
 
 
-### Testing
+Testing
+*******
 
 There is a dummy dbt project called dbt_test_project for testing some things that the official dbt integration tests do not cover. For running it first start an oracle database instance:
 
 ::
-        docker run \
-        --name dbt-oracle-db \
-        -d \
-        -p 1521:1521 \
-        epiclabs/docker-oracle-xe-11g
+
+    docker run \
+    --name dbt-oracle-db \
+    -d \
+    -p 1521:1521 \
+    epiclabs/docker-oracle-xe-11g
 
 
 Install the project locally
 
 ::
-        python setup.py install
+
+    python setup.py install
 
 
 then run dbt seed and run (theres is a profile file compatible with oracle 11g docker defaults at the test dir)
 
 ::
-        cd dbt_test_project
-        dbt seed --profiles-dir ./
-        dbt run --profiles-dir ./
+    
+    cd dbt_test_project
+    dbt seed --profiles-dir ./
+    dbt run --profiles-dir ./
 
 
-### DBT Integration Tests
+DBT Integration Tests
+**********************
 
 DBT team provides a project with some integration tests that can programatically assert that the plugin provides all 
 the DBT features.
@@ -64,10 +70,12 @@ The specific changes are specified at the project's readme
 for running it against dbt-oracle adapter one can run:
 
 ::
-        make test-dbt-integration
+
+    make test-dbt-integration
 
 
 
-### Final Notes
+Final Notes
+***********
 
 This is a new project and any contribuitions are wellcome.
