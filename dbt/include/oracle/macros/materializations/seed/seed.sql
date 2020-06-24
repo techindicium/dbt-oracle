@@ -7,17 +7,21 @@
     {% for chunk in agate_table.rows | batch(batch_size) %}
         {% set bindings = [] %}
 
+        {% for row in chunk %}
+            {% do bindings.extend(row) %}
+        {% endfor %}
+
         {% set sql %}
-            insert into {{ this.render() }} ({{ cols_sql }})
-            {% for row in chunk -%}
-                select
-                {%- for column in agate_table.column_names -%}
-                    {{" '" + row[loop.index - 1] + "' " }}
+            insert into {{ this.render() }} ({{ cols_sql }}) 
+            {% for row in chunk %}
+              select
+                {% for column in agate_table.column_names %}
+                    :p{{ loop.index }}
                     {%- if not loop.last%},{%- endif %}
-                {%- endfor -%}
-                from dual {{" "}}
-                {%- if not loop.last%} union all {{" "}} {%- endif %}
-            {%- endfor %}
+                {% endfor %}
+              from dual
+              {%- if not loop.last%} union all {%- endif -%}
+            {%- endfor -%}
         {% endset %}
 
         {% do adapter.add_query(sql, bindings=bindings, abridge_sql_log=True) %}
@@ -32,5 +36,5 @@
 {% endmacro %}
 
 {% macro oracle__load_csv_rows(model, agate_table) %}
-  {{ return(basic_load_csv_rows_oracle(model, 10000, agate_table) )}}
+  {{ return(basic_load_csv_rows_oracle(model, 50, agate_table) )}}
 {% endmacro %}
