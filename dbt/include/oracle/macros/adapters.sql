@@ -35,7 +35,7 @@
      dne_942    EXCEPTION;
      PRAGMA EXCEPTION_INIT(dne_942, -942);
   BEGIN
-     EXECUTE IMMEDIATE 'DROP {{ relation.type }} {{ relation }} cascade constraint';
+     EXECUTE IMMEDIATE 'DROP {{ relation.type }} {{ relation | replace('"', '') }} cascade constraint';
   EXCEPTION
      WHEN dne_942 THEN
         NULL; -- if it doesn't exist, do nothing .. no error, nothing .. ignore.
