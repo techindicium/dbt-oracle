@@ -36,6 +36,6 @@
 {% endmacro %}
 
 {% macro oracle__load_csv_rows(model, agate_table) %}
-  {{ return(oracle_basic_load_csv_rows(model, 50, agate_table) )}}
+  {{ return(oracle_basic_load_csv_rows(model, 100, agate_table) )}}
 {% endmacro %}
 

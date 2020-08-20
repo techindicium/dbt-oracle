@@ -27,19 +27,30 @@
   {{ exceptions.raise_compiler_error(msg) }}
 {% endmacro %}
 
-{% macro oracle__create_table_as(temporary, relation, sql) -%}
+{% macro oracle__create_table_as_backup(temporary, relation, sql) -%}
   {%- set sql_header = config.get('sql_header', none) -%}
 
   {{ sql_header if sql_header is not none }}
 
   create {% if temporary -%}
-    temporary
+    global temporary 
   {%- endif %} table {{ relation.include(schema=(not temporary)).quote(schema=False, identifier=False) }}
+  {% if temporary -%} on commit preserve rows {%- endif %}
   as 
     {{ sql }}
   
 {%- endmacro %}
 
+{% macro oracle__create_table_as(temporary, relation, sql) -%}
+  {%- set sql_header = config.get('sql_header', none) -%}
+
+  {{ sql_header if sql_header is not none }}
+
+  create table {{ relation.quote(schema=False, identifier=False) }}
+  as 
+    {{ sql }}
+  
+{%- endmacro %}
 {% macro oracle__create_view_as(relation, sql) -%}
   {%- set sql_header = config.get('sql_header', none) -%}
 
@@ -253,3 +264,11 @@
 {% macro oracle__current_timestamp() -%}
   CURRENT_DATE
 {%- endmacro %}
+
+{% macro oracle__make_temp_relation(base_relation, suffix) %}
+    {% set tmp_identifier = 'ora$ptt_' ~ base_relation.identifier %}
+    {% set tmp_relation = base_relation.incorporate(
+                                path={"identifier": tmp_identifier}) -%}
+
+    {% do return(tmp_relation) %}
+{% endmacro %}
