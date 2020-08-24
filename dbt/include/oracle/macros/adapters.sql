@@ -130,8 +130,8 @@
   {% if comment is not string %}
     {% do exceptions.raise_compiler_error('cannot escape a non-string: ' ~ comment) %}
   {% endif %}
-  {%- set start_quote = "'q{" -%}
-  {%- set end_quote = "}'" -%}
+  {%- set start_quote = "q'<" -%}
+  {%- set end_quote = ">'" -%}
   {%- if end_quote in comment -%}
     {%- do exceptions.raise_compiler_error('The string ' ~ end_quote ~ ' is not allowed in comments.') -%}
   {%- endif -%}
@@ -144,12 +144,20 @@
   comment on table {{ relation.quote(schema=False, identifier=False) }} is {{ escaped_comment }}
 {% endmacro %}
 
-{% macro oracle__alter_column_comment(relation, column_dict) %}
-  {% for column_name in column_dict %}
-    {% set comment = column_dict[column_name]['description'] %}
-    {% set escaped_comment = oracle_escape_comment(comment) %}
-    comment on column {{ relation.quote(schema=False, identifier=False) }}.{{ column_name }} is {{ escaped_comment }}
-  {% endfor %}
+{% macro oracle__persist_docs(relation, model, for_relation, for_columns) -%}
+  {% if for_relation and config.persist_relation_docs() and model.description %}
+    {% do run_query(alter_relation_comment(relation, model.description)) %}
+  {% endif %}
+  {% if for_columns and config.persist_column_docs() and model.columns %}
+    {% set column_dict = model.columns %}
+    {% for column_name in column_dict %}
+      {% set comment = column_dict[column_name]['description'] %}
+      {% set escaped_comment = oracle_escape_comment(comment) %}
+      {% call statement('alter _column comment', fetch_result=False) -%}
+        comment on column {{ relation.quote(schema=False, identifier=False) }}.{{ column_name }} is {{ escaped_comment }}
+      {%- endcall %}
+    {% endfor %}
+  {% endif %}
 {% endmacro %}
 
 {% macro oracle__alter_column_type(relation, column_name, new_column_type) -%}
@@ -161,10 +169,16 @@
   #}
   {%- set tmp_column = column_name + "__dbt_alter" -%}
 
-  {% call statement('alter_column_type') %}
-    alter table {{ relation.quote(schema=False, identifier=False) }} add column {{ adapter.quote(tmp_column) }} {{ new_column_type }};
-    update {{ relation.quote(schema=False, identifier=False)  }} set {{ adapter.quote(tmp_column) }} = {{ adapter.quote(column_name) }};
-    alter table {{ relation.quote(schema=False, identifier=False) }} drop column {{ adapter.quote(column_name) }} cascade;
+  {% call statement('alter_column_type 1', fetch_result=False) %}
+    alter table {{ relation.quote(schema=False, identifier=False) }} add column {{ adapter.quote(tmp_column) }} {{ new_column_type }}
+  {% endcall %}
+  {% call statement('alter_column_type 2', fetch_result=False) %}
+    update {{ relation.quote(schema=False, identifier=False)  }} set {{ adapter.quote(tmp_column) }} = {{ adapter.quote(column_name) }}
+  {% endcall %}
+  {% call statement('alter_column_type 3', fetch_result=False) %}
+    alter table {{ relation.quote(schema=False, identifier=False) }} drop column {{ adapter.quote(column_name) }} cascade
+  {% endcall %}
+  {% call statement('alter_column_type 4', fetch_result=False) %}
     rename column {{ relation.quote(schema=False, identifier=False) }}.{{ adapter.quote(tmp_column) }} to {{ adapter.quote(column_name) }}
   {% endcall %}
 
