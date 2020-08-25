@@ -71,18 +71,18 @@
                  from sys.all_views
           )
           select
-              tables.table_catalog as "table_database",
-              tables.table_schema as "table_schema",
-              tables.table_name as "table_name",
-              tables.table_type as "table_type",
+              lower(tables.table_catalog) as "table_database",
+              lower(tables.table_schema) as "table_schema",
+              lower(tables.table_name) as "table_name",
+              lower(tables.table_type) as "table_type",
               all_tab_comments.comments as "table_comment",
-              columns.column_name as "column_name",
+              lower(columns.column_name) as "column_name",
               ordinal_position as "column_index",
-              case
+              lower(case
                 when data_type like '%CHAR%'
                 then data_type || '(' || cast(char_length as varchar(10)) || ')'
                 else data_type
-              end as "column_type",
+              end) as "column_type",
               all_col_comments.comments as "column_comment",
               tables.table_schema as "table_owner"
           from tables
