@@ -20,7 +20,11 @@ class OracleAdapter(SQLAdapter):
         lens = (len(d.encode("utf-8")) for d in column.values_without_nulls())
         max_len = max(lens) if lens else 64
         length = max_len if max_len > 16 else 16
-        return "varchar({})".format(length)
+        return "varchar2({})".format(length)
+
+    @classmethod
+    def convert_date_type(cls, agate_table, col_idx):
+        return "timestamp"
 
     @classmethod
     def convert_datetime_type(cls, agate_table, col_idx):

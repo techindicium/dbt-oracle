@@ -15,12 +15,12 @@
         {% set sql %}
             insert all
             {% for row in chunk -%}
-              into {{ this.render() }} ({{ cols_sql }}) values
-                ( {%- for column in agate_table.column_names -%}
+              into {{ this.render() }} ({{ cols_sql }}) values(
+                {%- for column in agate_table.column_names -%}
                     :p{{ loop.index }} 
                     {%- if not loop.last%},{%- endif %}
-                {%- endfor %} )
-            {%- endfor %}
+                {%- endfor %})
+            {% endfor %}
             select * from dual
         {% endset %}
 
