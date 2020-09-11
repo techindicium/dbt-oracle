@@ -18,7 +18,7 @@ Installing:
 
 :: 
     
-    pip install dbt-oracle=0.1.3
+    pip install dbt-oracle=0.2.0
 
 Configure your profile
 ------------
