@@ -11,7 +11,7 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 requirements = [
-        'dbt-core==0.16.0',
+        'dbt-core==0.17.2',
         'cx_Oracle==7.3.0'
 ]
 
@@ -52,7 +52,7 @@ setup(
         'dbt': [
             'include/oracle/dbt_project.yml',
             'include/oracle/macros/*.sql',
-            'include/oracle/macros/materializations/seed/*.sql'
+            'include/oracle/macros/**/**/*.sql'
         ]
     }
 )
