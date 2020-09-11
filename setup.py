@@ -11,7 +11,7 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 requirements = [
-        'dbt-core==0.16.0',
+        'dbt-core==0.17.2',
         'cx_Oracle==7.3.0'
 ]
 
@@ -46,13 +46,13 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/techindicium/dbt-oracle',
-    version='0.1.3',
+    version='0.2.0',
     zip_safe=False,
     package_data={
         'dbt': [
             'include/oracle/dbt_project.yml',
             'include/oracle/macros/*.sql',
-            'include/oracle/macros/materializations/seed/*.sql'
+            'include/oracle/macros/**/**/*.sql'
         ]
     }
 )

@@ -10,18 +10,72 @@ Installation
 ------------
 
 You need the oracle database client installed in your system in order for this to work,
+here (https://cx-oracle.readthedocs.io/en/latest/user_guide/installation.html) you can find the cx_oracle python driver installation instructions.
 
-here(https://cx-oracle.readthedocs.io/en/latest/user_guide/installation.html) you can find the cx_oracle python driver installation instructions.
-
-this(https://gist.github.com/tcnksm/7316877) gist is a useful resource for installing in ubuntu. It's an onld link for ubuntu 12 but it still works at least for ubuntu 18.
+This (https://gist.github.com/tcnksm/7316877) gist is also a useful resource for installing the client in Ubuntu. It's an old link for Ubuntu 12 but it still works at least for ubuntu 18.
 
 Installing:
 
 :: 
     
-    pip install dbt-oracle=0.1.1
+    pip install dbt-oracle=0.2.0
 
+Configure your profile
+------------
+.. code-block:: yaml
 
+    dbt_oracle_test: 
+       target: dev
+       outputs:
+          dev:
+             type: oracle
+             host: localhost
+             user: system
+             pass: oracle
+             port: 1521
+             dbname: xe
+             schema: system
+             threads: 4
+
+Supported Features
+-------
+Materilizations
+###############
+
+* table: OK
+* view: OK
+* incremental: not OK
+* ephemeral: not tested
+
+Seeds 
+#####
+OK
+
+Hooks 
+#####
+OK
+
+Custom schemas 
+###############
+Not tested
+
+Sources 
+###################
+
+Not tested
+
+Testing & documentation
+#######################
+
+- Schema tests OK
+- Relationship testes Not OK
+- SQL Tests OK
+- Docs generate Not OK
+
+Snapshots 
+#########
+
+Not OK
 
 Testing
 -------
@@ -78,4 +132,12 @@ for running it against dbt-oracle adapter one can run:
 Final Notes
 -----------
 
-This is a new project and any contribuitions are wellcome.
+This is a new project and any contribuitions are welcome.
+
+ChangeLog
+-----------
+v0.1.3
+######
+
+First Version
+
