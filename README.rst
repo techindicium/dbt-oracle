@@ -21,7 +21,7 @@ Installing:
     pip install dbt-oracle=0.2.0
 
 Configure your profile
-------------
+----------------------
 .. code-block:: yaml
 
     dbt_oracle_test: 
@@ -38,7 +38,7 @@ Configure your profile
              threads: 4
 
 Supported Features
--------
+------------------
 Materilizations
 ###############
 
