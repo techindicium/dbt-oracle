@@ -112,12 +112,12 @@
           numeric_precision as "numeric_precision",
           numeric_scale as "numeric_scale"
       from columns
-      where table_name = upper('{{ relation.identifier }}')
+      where upper(table_name) = upper('{{ relation.identifier }}')
         {% if relation.schema %}
-        and table_schema = upper('{{ relation.schema }}')
+        and upper(table_schema) = upper('{{ relation.schema }}')
         {% endif %}
         {% if relation.database %}
-        and table_catalog = upper('{{ relation.database }}')
+        and upper(table_catalog) = upper('{{ relation.database }}')
         {% endif %}
       order by ordinal_position
 
@@ -269,8 +269,8 @@
     end as "kind"
   from tables
   where table_type in ('BASE TABLE', 'VIEW')
-    and table_catalog = upper('{{ schema_relation.database }}')
-    and table_schema = upper('{{ schema_relation.schema }}')
+    and upper(table_catalog) = upper('{{ schema_relation.database }}')
+    and upper(table_schema) = upper('{{ schema_relation.schema }}')
   {% endcall %}
   {{ return(load_result('list_relations_without_caching').table) }}
 {% endmacro %}
