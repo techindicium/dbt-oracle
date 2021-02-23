@@ -20,3 +20,7 @@ class OracleIncludePolicy(Policy):
 class OracleRelation(BaseRelation):
     quote_policy: OracleQuotePolicy = OracleQuotePolicy()
     include_policy: OracleIncludePolicy = OracleIncludePolicy()
+
+    @staticmethod
+    def add_ephemeral_prefix(name):
+        return f'dbt__cte__{name}__'
