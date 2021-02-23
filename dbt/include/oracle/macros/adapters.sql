@@ -238,9 +238,13 @@
    DECLARE
      dne_942    EXCEPTION;
      PRAGMA EXCEPTION_INIT(dne_942, -942);
+     attempted_ddl_on_in_use_GTT EXCEPTION;
+     pragma EXCEPTION_INIT(attempted_ddl_on_in_use_GTT, -14452);
   BEGIN
      EXECUTE IMMEDIATE 'DROP {{ relation.type }} {{ relation.quote(schema=False, identifier=False) }} cascade constraint';
   EXCEPTION
+     WHEN attempted_ddl_on_in_use_GTT THEN
+        NULL; -- if it its a global temporary table, leave it alone.
      WHEN dne_942 THEN
         NULL; -- if it doesn't exist, do nothing .. no error, nothing .. ignore.
   END;
