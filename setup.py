@@ -17,7 +17,9 @@ requirements = [
 
 setup_requirements = []
 
-test_requirements = []
+test_requirements = [
+    'pytest-dbt-adapter==0.3.0'
+]
 
 setup(
     author="Indicium Tech",
