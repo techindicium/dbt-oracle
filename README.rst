@@ -17,8 +17,8 @@ This (https://gist.github.com/tcnksm/7316877) gist is also a useful resource for
 Installing:
 
 :: 
-    
-    pip install dbt-oracle=0.2.0
+ 
+    pip install dbt-oracle=0.3.0
 
 Configure your profile
 ----------------------
@@ -37,6 +37,7 @@ Configure your profile
              schema: system
              threads: 4
 
+
 Supported Features
 ------------------
 Materilizations
@@ -44,8 +45,8 @@ Materilizations
 
 * table: OK
 * view: OK
-* incremental: not OK
-* ephemeral: not tested
+* incremental: OK
+* ephemeral: not OK
 
 Seeds 
 #####
@@ -68,20 +69,23 @@ Testing & documentation
 #######################
 
 - Schema tests OK
-- Relationship testes Not OK
+- Relationship tests Not OK
 - SQL Tests OK
 - Docs generate Not OK
 
 Snapshots 
 #########
 
-Not OK
+OK
 
 Testing
 -------
 
-There is a dummy dbt project called dbt_test_project for testing some things that the official dbt integration tests do not cover. For running it first start an oracle database instance:
+There is a dummy dbt project called dbt_test_project for testing some things that the official dbt integration tests do not cover.
+For both dbt_test_project and dbt oficial adpter tests we are using a database user 'dbt_test' with password 'dbt_test'
+You have to either create this user os change the credentias at tests/oracle.dbtspec and dbt_test_project/profiles.yml
 
+For running it first start an oracle database instance:
 ::
 
     docker run \

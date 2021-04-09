@@ -53,16 +53,13 @@ lint: ## check style with flake8
 test: ## run tests quickly with the default Python
 	cd dbt_test_project && dbt seed --profiles-dir ./
 	cd dbt_test_project && dbt run --profiles-dir ./
+	cd dbt_test_project && dbt test --profiles-dir ./
 
 test-all: ## run tests on every Python version with tox
 	tox
 
 test-dbt-integration: ## run dbt team integration tests
-	rm -rf dbt_integration_test
-	git clone git@github.com:vitoravancini/dbt-integration-tests.git dbt_integration_test
-	cd dbt_integration_test && pip install -r requirements.txt
-	cp dbt_test_project/profiles.yml dbt_integration_test/
-	cd dbt_integration_test && bash bin/run-with-profile dbt_oracle_test "$(shell pwd)/dbt_integration_test/"
+	pytest
 
 coverage: ## check code coverage quickly with the default Python
 	coverage run --source oracle_dbt setup.py test
