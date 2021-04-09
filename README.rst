@@ -109,28 +109,26 @@ then run dbt seed and run (theres is a profile file compatible with oracle 11g d
     cd dbt_test_project
     dbt seed --profiles-dir ./
     dbt run --profiles-dir ./
+    dbt test --profiles-dir ./
 
-
-DBT Integration Tests
----------------------
-
-DBT team provides a project with some integration tests that can programatically assert that the plugin provides all 
-the DBT features.
-
-you can find it here: https://github.com/fishtown-analytics/dbt-integration-tests
-
-Currently we are using a fork of this project to apadpt some parts of it for running with oracle db
-
-https://github.com/vitoravancini/dbt-integration-tests
-
-The specific changes are specified at the project's readme
-
-for running it against dbt-oracle adapter one can run:
+you can also run 
 
 ::
 
-    make test-dbt-integration
+    make test
 
+for running both dbt adapter tests and the dbt_test_project included in this repo
+
+The following dbt adapter tests are passing:
+
+::
+    tests/oracle.dbtspec::test_dbt_empty
+    tests/oracle.dbtspec::test_dbt_base
+    tests/oracle.dbtspec::test_dbt_ephemeral
+    tests/oracle.dbtspec::test_dbt_incremental
+    tests/oracle.dbtspec::test_dbt_snapshot_strategy_timestamp
+    tests/oracle.dbtspec::test_dbt_snapshot_strategy_check_cols
+    tests/oracle.dbtspec::test_dbt_schema_test
 
 
 Final Notes
@@ -138,10 +136,4 @@ Final Notes
 
 This is a new project and any contribuitions are welcome.
 
-ChangeLog
------------
-v0.1.3
-######
-
-First Version
 
