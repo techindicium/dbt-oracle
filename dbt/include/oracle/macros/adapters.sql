@@ -2,11 +2,11 @@
     {% call statement('get_columns_in_query', fetch_result=True, auto_begin=False) -%}
         select * from (
             {{ select_sql }}
-        ) __dbt_sbq
+        ) dbt_sbq_tmp
         where 1 = 0 and rownum < 1
     {% endcall %}
 
-    {{ return(load_result('get_columns_in_query').table.columns | map(attribute='name') | lower | list) }}
+    {{ return(load_result('get_columns_in_query').table.columns | map(attribute='name') | list) }}
 {% endmacro %}
 
 {% macro oracle__create_schema(database_name, schema_name) -%}
@@ -329,12 +329,12 @@
 {% endmacro %}
 
 {% macro oracle__current_timestamp() -%}
-  CURRENT_DATE
+  CURRENT_TIMESTAMP
 {%- endmacro %}
 
 {% macro oracle__make_temp_relation(base_relation, suffix) %}
     {% set dt = modules.datetime.datetime.now() %}
-    {% set dtstring = dt.strftime("%H%M%S%f") %}
+    {% set dtstring = dt.strftime("%H%M%S") %}
     {% set tmp_identifier = 'o$pt_' ~ base_relation.identifier ~ dtstring %}
     {% set tmp_relation = base_relation.incorporate(
                                 path={"identifier": tmp_identifier}) -%}

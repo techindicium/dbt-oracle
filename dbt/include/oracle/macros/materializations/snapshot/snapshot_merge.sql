@@ -19,7 +19,7 @@
         then update
         set dbt_valid_to = s.dbt_valid_to
         where d.dbt_valid_to is null
-          and s.dbt_change_type = 'update'
+          and s.dbt_change_type in ('update', 'delete')
     when not matched
         then insert ({{ dest_cols_csv | join(', ') }})
         values ({{ insert_cols_csv | join(', ') }})

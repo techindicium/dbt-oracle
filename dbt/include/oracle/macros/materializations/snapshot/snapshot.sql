@@ -37,6 +37,7 @@
             {{ strategy.unique_key }} as dbt_unique_key
 
         from {{ target_relation }}
+        where dbt_valid_to is null
 
     ),
 
@@ -65,6 +66,17 @@
         from snapshot_query
     ),
 
+    {%- if strategy.invalidate_hard_deletes %}
+
+    deletes_source_data as (
+
+        select 
+            snapshot_query.*,
+            {{ strategy.unique_key }} as dbt_unique_key
+        from snapshot_query
+    ),
+    {% endif %}
+
     insertions as (
 
         select
@@ -76,7 +88,6 @@
         where snapshotted_data.dbt_unique_key is null
            or (
                 snapshotted_data.dbt_unique_key is not null
-            and snapshotted_data.dbt_valid_to is null
             and (
                 {{ strategy.row_changed }}
             )
@@ -93,17 +104,40 @@
 
         from updates_source_data source_data
         join snapshotted_data on snapshotted_data.dbt_unique_key = source_data.dbt_unique_key
-        where snapshotted_data.dbt_valid_to is null
-        and (
+        where (
             {{ strategy.row_changed }}
         )
     )
 
+    {%- if strategy.invalidate_hard_deletes -%}
+    ,
+
+    deletes as (
+    
+        select
+            'delete' as dbt_change_type,
+            source_data.*,
+            {{ snapshot_get_time() }} as dbt_valid_from,
+            {{ snapshot_get_time() }} as dbt_updated_at,
+            {{ snapshot_get_time() }} as dbt_valid_to,
+            snapshotted_data.dbt_scd_id
+    
+        from snapshotted_data
+        left join deletes_source_data as source_data on snapshotted_data.dbt_unique_key = source_data.dbt_unique_key
+        where source_data.dbt_unique_key is null
+    )
+    {%- endif %}
+
     select * from insertions
     union all
     select * from updates
+    {%- if strategy.invalidate_hard_deletes %}
+    union all
+    select * from deletes
+    {%- endif %}
 
 {%- endmacro %}
+
 
 
 {% macro build_snapshot_table(strategy, sql) %}
@@ -112,7 +146,7 @@
         {{ strategy.scd_id }} as dbt_scd_id,
         {{ strategy.updated_at }} as dbt_updated_at,
         {{ strategy.updated_at }} as dbt_valid_from,
-        nullif({{ strategy.updated_at }}, {{ strategy.updated_at }}) as dbt_valid_to
+        cast(nullif({{ strategy.updated_at }}, {{ strategy.updated_at }}) as DATE) as dbt_valid_to
     from (
         {{ sql }}
     ) sbq
@@ -249,4 +283,9 @@
         coalesce(cast({{ arg }} as varchar(50) ), '')
         {% if not loop.last %} || '|' || {% endif %}
     {%- endfor -%})
+{%- endmacro %}
+
+{% macro oracle__snapshot_string_as_time(timestamp) -%}
+    {%- set result = "TO_TIMESTAMP('"~ timestamp ~ "','yyyy/mm/dd hh24:mi:ss.FF')" -%}
+    {{ return(result) }}
 {%- endmacro %}
