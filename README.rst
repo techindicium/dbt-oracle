@@ -2,6 +2,7 @@
 Oracle DBT
 ==========
 
+Tested with dbt==0.18.0
 
 .. image:: https://img.shields.io/pypi/v/dbt-oracle.svg
         :target: https://pypi.python.org/pypi/dbt-oracle
