@@ -131,6 +131,16 @@ The following dbt adapter tests are passing:
     tests/oracle.dbtspec::test_dbt_snapshot_strategy_check_cols
     tests/oracle.dbtspec::test_dbt_schema_test
 
+Known failing tests:
+
+::
+
+    FAILED tests/oracle.dbtspec::test_dbt_data_test
+    FAILED tests/oracle.dbtspec::test_dbt_ephemeral_data_tests
+    
+The dbt adapter tests for data tests fails due to how the test_dbt_data_test sequence is implemented.
+You can use data tests with this adapter, there is an example at the test project in this repo.
+
 
 Final Notes
 -----------
