@@ -50,14 +50,13 @@ clean-test: ## remove test and coverage artifacts
 lint: ## check style with flake8
 	flake8 oracle_dbt tests
 
-test: ## run tests quickly with the default Python
+test-dbt-project: ## run tests quickly with the default Python
 	cd dbt_test_project && dbt seed --profiles-dir ./
 	cd dbt_test_project && dbt run --profiles-dir ./
 	cd dbt_test_project && dbt test --profiles-dir ./
 
-test-all: ## run tests on every Python version with tox
-	tox
-
+test: test-dbt-integration test-dbt-project  ## run tests on every Python version with tox
+	
 test-dbt-integration: ## run dbt team integration tests
 	pytest
 

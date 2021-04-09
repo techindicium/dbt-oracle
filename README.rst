@@ -122,6 +122,7 @@ for running both dbt adapter tests and the dbt_test_project included in this rep
 The following dbt adapter tests are passing:
 
 ::
+
     tests/oracle.dbtspec::test_dbt_empty
     tests/oracle.dbtspec::test_dbt_base
     tests/oracle.dbtspec::test_dbt_ephemeral
