@@ -2,29 +2,75 @@
     {% call statement('get_columns_in_query', fetch_result=True, auto_begin=False) -%}
         select * from (
             {{ select_sql }}
-        ) __dbt_sbq
+        ) dbt_sbq_tmp
         where 1 = 0 and rownum < 1
     {% endcall %}
 
-    {{ return(load_result('get_columns_in_query').table.columns | map(attribute='name') | lower | list) }}
+    {{ return(load_result('get_columns_in_query').table.columns | map(attribute='name') | list) }}
 {% endmacro %}
 
 {% macro oracle__create_schema(database_name, schema_name) -%}
-  {% set typename = adapter.type() %}
-  {% set msg -%}
-    create_schema not implemented for {{ typename }}
-  {%- endset %}
-
-  {{ exceptions.raise_compiler_error(msg) }}
+  {% if relation.database -%}
+    {{ adapter.verify_database(relation.database) }}
+  {%- endif -%}
+  {%- call statement('drop_schema') -%}
+    -- Noop for not breaking tests, oracle
+    -- schemas are actualy users, we can't
+    -- create it here
+    select 'a' from dual
+  {%- endcall -%}
 {% endmacro %}
 
-{% macro oracle__drop_schema(database_name, schema_name) -%}
-  {% set typename = adapter.type() %}
-  {% set msg -%}
-    drop_schema  not implemented for {{ typename }}
-  {%- endset %}
-
-  {{ exceptions.raise_compiler_error(msg) }}
+{% macro oracle__drop_schema(schema) -%}
+  {% if schema.database -%}
+    {{ adapter.verify_database(schema.database) }}
+  {%- endif -%}
+  {%- call statement('drop_schema') -%}
+    -- from https://gist.github.com/rafaeleyng/33eaef673fc4ee98a6de4f70c8ce3657
+    BEGIN
+    FOR cur_rec IN (SELECT object_name, object_type
+                      FROM ALL_objects
+                      WHERE object_type IN
+                              ('TABLE',
+                                'VIEW',
+                                'PACKAGE',
+                                'PROCEDURE',
+                                'FUNCTION',
+                                'SEQUENCE',
+                                'TYPE',
+                                'SYNONYM',
+                                'MATERIALIZED VIEW'
+                              )
+                      AND owner = '{{ schema | upper }}')
+    LOOP
+        BEGIN
+          IF cur_rec.object_type = 'TABLE'
+          THEN
+              EXECUTE IMMEDIATE    'DROP '
+                                || cur_rec.object_type
+                                || ' "'
+                                || cur_rec.object_name
+                                || '" CASCADE CONSTRAINTS';
+          ELSE
+              EXECUTE IMMEDIATE    'DROP '
+                                || cur_rec.object_type
+                                || ' "'
+                                || cur_rec.object_name
+                                || '"';
+          END IF;
+        EXCEPTION
+          WHEN OTHERS
+          THEN
+              DBMS_OUTPUT.put_line (   'FAILED: DROP '
+                                    || cur_rec.object_type
+                                    || ' "'
+                                    || cur_rec.object_name
+                                    || '"'
+                                  );
+        END;
+    END LOOP;
+  END;
+  {%- endcall -%}
 {% endmacro %}
 
 {% macro oracle__create_table_as_backup(temporary, relation, sql) -%}
@@ -45,8 +91,11 @@
   {%- set sql_header = config.get('sql_header', none) -%}
 
   {{ sql_header if sql_header is not none }}
-
-  create table {{ relation.quote(schema=False, identifier=False) }}
+  
+  create {% if temporary -%}
+    global temporary 
+  {%- endif %} table {{ relation.include(schema=(not temporary)).quote(schema=False, identifier=False) }}
+  {% if temporary -%} on commit preserve rows {%- endif %}
   as 
     {{ sql }}
   
@@ -189,9 +238,13 @@
    DECLARE
      dne_942    EXCEPTION;
      PRAGMA EXCEPTION_INIT(dne_942, -942);
+     attempted_ddl_on_in_use_GTT EXCEPTION;
+     pragma EXCEPTION_INIT(attempted_ddl_on_in_use_GTT, -14452);
   BEGIN
      EXECUTE IMMEDIATE 'DROP {{ relation.type }} {{ relation.quote(schema=False, identifier=False) }} cascade constraint';
   EXCEPTION
+     WHEN attempted_ddl_on_in_use_GTT THEN
+        NULL; -- if it its a global temporary table, leave it alone.
      WHEN dne_942 THEN
         NULL; -- if it doesn't exist, do nothing .. no error, nothing .. ignore.
   END;
@@ -276,11 +329,13 @@
 {% endmacro %}
 
 {% macro oracle__current_timestamp() -%}
-  CURRENT_DATE
+  CURRENT_TIMESTAMP
 {%- endmacro %}
 
 {% macro oracle__make_temp_relation(base_relation, suffix) %}
-    {% set tmp_identifier = 'ora$ptt_' ~ base_relation.identifier %}
+    {% set dt = modules.datetime.datetime.now() %}
+    {% set dtstring = dt.strftime("%H%M%S") %}
+    {% set tmp_identifier = 'o$pt_' ~ base_relation.identifier ~ dtstring %}
     {% set tmp_relation = base_relation.incorporate(
                                 path={"identifier": tmp_identifier}) -%}
 

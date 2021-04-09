@@ -17,8 +17,8 @@ This (https://gist.github.com/tcnksm/7316877) gist is also a useful resource for
 Installing:
 
 :: 
-    
-    pip install dbt-oracle=0.2.0
+ 
+    pip install dbt-oracle=0.3.0
 
 Configure your profile
 ----------------------
@@ -37,6 +37,7 @@ Configure your profile
              schema: system
              threads: 4
 
+
 Supported Features
 ------------------
 Materilizations
@@ -44,8 +45,8 @@ Materilizations
 
 * table: OK
 * view: OK
-* incremental: not OK
-* ephemeral: not tested
+* incremental: OK
+* ephemeral: not OK
 
 Seeds 
 #####
@@ -68,20 +69,23 @@ Testing & documentation
 #######################
 
 - Schema tests OK
-- Relationship testes Not OK
+- Relationship tests Not OK
 - SQL Tests OK
 - Docs generate Not OK
 
 Snapshots 
 #########
 
-Not OK
+OK
 
 Testing
 -------
 
-There is a dummy dbt project called dbt_test_project for testing some things that the official dbt integration tests do not cover. For running it first start an oracle database instance:
+There is a dummy dbt project called dbt_test_project for testing some things that the official dbt integration tests do not cover.
+For both dbt_test_project and dbt oficial adpter tests we are using a database user 'dbt_test' with password 'dbt_test'
+You have to either create this user os change the credentias at tests/oracle.dbtspec and dbt_test_project/profiles.yml
 
+For running it first start an oracle database instance:
 ::
 
     docker run \
@@ -105,28 +109,37 @@ then run dbt seed and run (theres is a profile file compatible with oracle 11g d
     cd dbt_test_project
     dbt seed --profiles-dir ./
     dbt run --profiles-dir ./
+    dbt test --profiles-dir ./
 
-
-DBT Integration Tests
----------------------
-
-DBT team provides a project with some integration tests that can programatically assert that the plugin provides all 
-the DBT features.
-
-you can find it here: https://github.com/fishtown-analytics/dbt-integration-tests
-
-Currently we are using a fork of this project to apadpt some parts of it for running with oracle db
-
-https://github.com/vitoravancini/dbt-integration-tests
-
-The specific changes are specified at the project's readme
-
-for running it against dbt-oracle adapter one can run:
+you can also run 
 
 ::
 
-    make test-dbt-integration
+    make test
 
+for running both dbt adapter tests and the dbt_test_project included in this repo
+
+The following dbt adapter tests are passing:
+
+::
+
+    tests/oracle.dbtspec::test_dbt_empty
+    tests/oracle.dbtspec::test_dbt_base
+    tests/oracle.dbtspec::test_dbt_ephemeral
+    tests/oracle.dbtspec::test_dbt_incremental
+    tests/oracle.dbtspec::test_dbt_snapshot_strategy_timestamp
+    tests/oracle.dbtspec::test_dbt_snapshot_strategy_check_cols
+    tests/oracle.dbtspec::test_dbt_schema_test
+
+Known failing tests:
+
+::
+
+    FAILED tests/oracle.dbtspec::test_dbt_data_test
+    FAILED tests/oracle.dbtspec::test_dbt_ephemeral_data_tests
+    
+The dbt adapter tests for data tests fails due to how the test_dbt_data_test sequence is implemented.
+You can use data tests with this adapter, there is an example at the test project in this repo.
 
 
 Final Notes
@@ -134,10 +147,4 @@ Final Notes
 
 This is a new project and any contribuitions are welcome.
 
-ChangeLog
------------
-v0.1.3
-######
-
-First Version
 

@@ -1,0 +1,17 @@
+target:
+  type: oracle
+  host: localhost
+  user: dbt_test
+  pass: dbt_test
+  database: xe
+  schema: dbt_test
+  port: 1521
+  threads: 1
+sequences:
+  test_dbt_empty: empty
+  test_dbt_base: base
+  test_dbt_ephemeral: ephemeral
+  test_dbt_incremental: incremental
+  test_dbt_snapshot_strategy_timestamp: snapshot_strategy_timestamp
+  test_dbt_snapshot_strategy_check_cols: snapshot_strategy_check_cols
+  test_dbt_schema_test: schema_test

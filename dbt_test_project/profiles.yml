@@ -4,9 +4,9 @@ dbt_oracle_test:
       dev:
          type: oracle
          host: localhost
-         user: system
-         pass: oracle
+         user: dbt_test
+         pass: dbt_test
          port: 1521
          dbname: xe
-         schema: system
+         schema: dbt_test
          threads: 4
