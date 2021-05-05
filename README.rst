@@ -2,7 +2,9 @@
 Oracle DBT
 ==========
 
-Tested with dbt==0.18.0
+Tested with dbt==0.19.1
+
+for dbt 0.18.0 and below, use dbt-oracle version 0.3.2
 
 .. image:: https://img.shields.io/pypi/v/dbt-oracle.svg
         :target: https://pypi.python.org/pypi/dbt-oracle
@@ -19,7 +21,7 @@ Installing:
 
 :: 
  
-    pip install dbt-oracle=0.3.2
+    pip install dbt-oracle=0.4.0
 
 Configure your profile
 ----------------------
