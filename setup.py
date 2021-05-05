@@ -11,7 +11,7 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 requirements = [
-        'dbt-core==0.18.0',
+        'dbt-core~=0.19.0',
         'cx_Oracle==7.3.0'
 ]
 
