@@ -95,6 +95,10 @@ class OracleAdapterConnectionManager(SQLConnectionManager):
         # Do oracle cx has something for this? could not find it
         return 'OK'
 
+    @classmethod
+    def get_response(cls, cursor):
+        return 'OK'
+
     @contextmanager
     def exception_handler(self, sql):
         try:
