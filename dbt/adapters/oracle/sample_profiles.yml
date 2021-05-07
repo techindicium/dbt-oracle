@@ -1,0 +1,13 @@
+default:
+   target: dev
+   outputs:
+      dev:
+         type: oracle
+         host: [host - default is localhost]
+         user: system
+         password: oracle
+         port: 1521
+         dbname: [dbname]
+         schema: [schema]
+         threads: [1 or more]
+        
