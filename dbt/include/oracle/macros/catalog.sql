@@ -52,8 +52,8 @@
               from sys.all_tab_columns
           ),
           tables as
-                (select SYS_CONTEXT('userenv', 'DB_NAME') table_catalog,
-                   owner table_schema,
+                (select UPPER(SYS_CONTEXT('userenv', 'DB_NAME')) table_catalog,
+                   UPPER(owner) table_schema,
                    table_name,
                    case
                      when iot_type = 'Y'
