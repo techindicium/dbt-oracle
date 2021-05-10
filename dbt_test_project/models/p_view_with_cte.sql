@@ -1,4 +1,4 @@
-{{config(materialization='view')}}
+{{config(materialized='view')}}
 with persons_filtered as(
     select * from {{ source('hr_database', 'employees') }}
     where employee_Id = 100
