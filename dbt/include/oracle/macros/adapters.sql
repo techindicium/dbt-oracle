@@ -79,42 +79,42 @@
   {{ sql_header if sql_header is not none }}
 
   create {% if temporary -%}
-    global temporary 
+    global temporary
   {%- endif %} table {{ relation.include(schema=(not temporary)).quote(schema=False, identifier=False) }}
   {% if temporary -%} on commit preserve rows {%- endif %}
-  as 
+  as
     {{ sql }}
-  
+
 {%- endmacro %}
 
 {% macro oracle__create_table_as(temporary, relation, sql) -%}
   {%- set sql_header = config.get('sql_header', none) -%}
 
   {{ sql_header if sql_header is not none }}
-  
+
   create {% if temporary -%}
-    global temporary 
+    global temporary
   {%- endif %} table {{ relation.include(schema=(not temporary)).quote(schema=False, identifier=False) }}
   {% if temporary -%} on commit preserve rows {%- endif %}
-  as 
+  as
     {{ sql }}
-  
+
 {%- endmacro %}
 {% macro oracle__create_view_as(relation, sql) -%}
   {%- set sql_header = config.get('sql_header', none) -%}
 
   {{ sql_header if sql_header is not none }}
-  create view {{ relation.quote(schema=False, identifier=False)  }} as 
+  create view {{ relation.quote(schema=False, identifier=False)  }} as
     {{ sql }}
-  
+
 {% endmacro %}
 
 {% macro oracle__get_columns_in_relation(relation) -%}
   {% call statement('get_columns_in_relation', fetch_result=True) %}
       with columns as (
         select
-            SYS_CONTEXT('userenv', 'DB_NAME') table_catalog,
-            owner table_schema,
+            UPPER(SYS_CONTEXT('userenv', 'DB_NAME')) table_catalog,
+            UPPER(owner) table_schema,
             table_name,
             column_name,
             data_type,
