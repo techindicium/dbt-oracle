@@ -295,8 +295,8 @@
 {% macro oracle__list_relations_without_caching(schema_relation) %}
   {% call statement('list_relations_without_caching', fetch_result=True) -%}
     with tables as
-      (select SYS_CONTEXT('userenv', 'DB_NAME') table_catalog,
-         owner table_schema,
+      (select UPPER(SYS_CONTEXT('userenv', 'DB_NAME')) table_catalog,
+         UPPER(owner) table_schema,
          table_name,
          case
            when iot_type = 'Y'
@@ -307,8 +307,8 @@
          end table_type
        from sys.all_tables
        union all
-       select SYS_CONTEXT('userenv', 'DB_NAME'),
-         owner,
+       select UPPER(SYS_CONTEXT('userenv', 'DB_NAME')),
+         UPPER(owner),
          view_name,
          'VIEW'
        from sys.all_views
