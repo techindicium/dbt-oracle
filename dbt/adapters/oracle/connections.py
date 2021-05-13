@@ -54,13 +54,13 @@ class OracleAdapterConnectionManager(SQLConnectionManager):
         host = f'{credentials.host}:{credentials.port}/{credentials.database}'
 
         try:
-            handle = cx_Oracle.connect(
-                credentials.user,
-                credentials.password,
-                host,
-                encoding="UTF-8"
-            )
-
+            #handle = cx_Oracle.connect(
+            #    credentials.user,
+            #    credentials.password,
+            #    host,
+            #    encoding="UTF-8"
+            #)
+            handle = cx_Oracle.connect(credentials.user,credentials.password, credentials.database,encoding="UTF-8")
             connection.handle = handle
             connection.state = 'open'
         except cx_Oracle.DatabaseError as e:
