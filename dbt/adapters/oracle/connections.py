@@ -24,6 +24,7 @@ class OracleAdapterCredentials(Credentials):
     password: str  # on postgres the password is mandatoryd
 
     _ALIASES = {
+        'system' : 'system',
         'dbname': 'database',
         'sid': 'schema',
         'pass': 'password'
@@ -37,7 +38,7 @@ class OracleAdapterCredentials(Credentials):
         """
         List of keys to display in the `dbt info` output.
         """
-        return ('database', 'schema', 'host', 'port', 'user')
+        return ('database', 'schema', 'host', 'system', 'port', 'user')
 
 
 class OracleAdapterConnectionManager(SQLConnectionManager):
@@ -51,7 +52,7 @@ class OracleAdapterConnectionManager(SQLConnectionManager):
             return connection
 
         credentials = cls.get_credentials(connection.credentials)
-        host = f'{credentials.host}:{credentials.port}/{credentials.database}'
+        host = f'{credentials.host}:{credentials.port}/{credentials.system}'
 
         try:
             handle = cx_Oracle.connect(
