@@ -18,11 +18,11 @@ from dbt.adapters.sql import SQLConnectionManager
 
 @dataclass
 class OracleAdapterCredentials(Credentials):
+    user: str
+    password: str
     host: str
     port: int = 1524
     system: Optional[str] = None
-    user: str
-    password: str
     
     _ALIASES = {
         'dbname': 'database',
