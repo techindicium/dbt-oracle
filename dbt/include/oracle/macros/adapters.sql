@@ -322,7 +322,7 @@
     end as "kind"
   from tables
   where table_type in ('BASE TABLE', 'VIEW')
-    and table_catalog = upper('{{ schema_relation.database }}')
+    -- and table_catalog = upper('{{ schema_relation.database }}')
     and table_schema = upper('{{ schema_relation.schema }}')
   {% endcall %}
   {{ return(load_result('list_relations_without_caching').table) }}
