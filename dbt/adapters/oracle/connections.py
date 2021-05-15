@@ -19,12 +19,12 @@ from dbt.adapters.sql import SQLConnectionManager
 @dataclass
 class OracleAdapterCredentials(Credentials):
     host: str
+    port: int = 1524
+    system: Optional[str] = None
     user: str
-    port: Port
-    password: str  # on postgres the password is mandatoryd
-
+    password: str
+    
     _ALIASES = {
-        'system' : 'system',
         'dbname': 'database',
         'sid': 'schema',
         'pass': 'password'
@@ -36,7 +36,7 @@ class OracleAdapterCredentials(Credentials):
 
     def _connection_keys(self):
         """
-        List of keys to display in the `dbt info` output.
+        List of keys to display in the `dbt debug` output.
         """
         return ('database', 'schema', 'host', 'system', 'port', 'user')
 
@@ -52,13 +52,18 @@ class OracleAdapterConnectionManager(SQLConnectionManager):
             return connection
 
         credentials = cls.get_credentials(connection.credentials)
-        host = f'{credentials.host}:{credentials.port}/{credentials.system}'
+        # If the 'system' property is not provided, use 'dbname' property
+        if credentials.system is None:
+            system = credentials.dbname
+        else:
+            system = credentials.system
+        connection_string = f'{credentials.host}:{credentials.port}/{system}'
 
         try:
             handle = cx_Oracle.connect(
                 credentials.user,
                 credentials.password,
-                host,
+                connection_string,
                 encoding="UTF-8"
             )
 
