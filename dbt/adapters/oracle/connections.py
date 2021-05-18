@@ -18,14 +18,13 @@ from dbt.adapters.sql import SQLConnectionManager
 
 @dataclass
 class OracleAdapterCredentials(Credentials):
-    host: str
     user: str
-    port: Port
-    password: str  # on postgres the password is mandatoryd
+    password: str
+    host: Optional[str] = None
+    port: Optional[Port] = None
 
     _ALIASES = {
         'dbname': 'database',
-        'sid': 'schema',
         'pass': 'password'
     }
 
@@ -44,6 +43,17 @@ class OracleAdapterConnectionManager(SQLConnectionManager):
     TYPE = 'oracle'
 
     @classmethod
+    def _build_host(cls, credentials: Credentials) -> str:
+        host = credentials.host
+        
+        if credentials.port:
+            host += f':{credentials.port}'
+        
+        host += f'/{credentials.database}'
+        return host
+
+
+    @classmethod
     def open(cls, connection):
 
         if connection.state == 'open':
@@ -51,18 +61,28 @@ class OracleAdapterConnectionManager(SQLConnectionManager):
             return connection
 
         credentials = cls.get_credentials(connection.credentials)
-        host = f'{credentials.host}:{credentials.port}/{credentials.database}'
 
         try:
-            handle = cx_Oracle.connect(
-                credentials.user,
-                credentials.password,
-                host,
-                encoding="UTF-8"
-            )
-
+            if credentials.host:
+                host = cls._build_host(credentials=credentials)
+                handle = cx_Oracle.connect(
+                    credentials.user,
+                    credentials.password,
+                    host,
+                    encoding="UTF-8"
+                )
+            else:
+                # Without setting a host, a tnsnames.ora file will be looked up for
+                # connection info
+                handle = cx_Oracle.connect(
+                    credentials.user,
+                    credentials.password, 
+                    credentials.database,
+                    encoding="UTF-8"
+                )
             connection.handle = handle
             connection.state = 'open'
+            
         except cx_Oracle.DatabaseError as e:
             logger.info("Got an error when attempting to open an oracle "
                          "connection: '{}'"
