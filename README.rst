@@ -21,10 +21,14 @@ Installing:
 
 :: 
  
-    pip install dbt-oracle==0.4.0
+    pip install dbt-oracle==0.4.2
 
 Configure your profile
 ----------------------
+
+dbt-oracle supports two authentication methods, setting host and port
+like the following example:
+
 .. code-block:: yaml
 
     dbt_oracle_test: 
@@ -40,6 +44,35 @@ Configure your profile
              schema: system
              threads: 4
 
+and setting only user and pasword and configuring your ORACLE_HOME environment
+variable so dbt-oracle can find the tnsnames.ora file. Let's assume your tnsnames.ora file
+is placed at 
+
+:: 
+ 
+    /home/user/oracle/network/admin/tnsnames.ora
+
+
+you could set 
+
+:: 
+ 
+    ORACLE_HOME=/home/user/oracle/ 
+
+and your profile:
+
+.. code-block:: yaml
+
+    dbt_oracle_test: 
+       target: dev
+       outputs:
+          dev:
+             type: oracle
+             user: system
+             pass: oracle
+             dbname: xe
+             schema: system
+             threads: 4
 
 Supported Features
 ------------------
@@ -91,10 +124,10 @@ You have to either create this user os change the credentias at tests/oracle.dbt
 For running it first start an oracle database instance:
 ::
 
-    docker run \
+docker run \
     --name dbt-oracle-db \
     -d \
-    -p 1521:1521 \
+    -p 1522:1522 \
     epiclabs/docker-oracle-xe-11g
 
 

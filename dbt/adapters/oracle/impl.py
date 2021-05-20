@@ -44,6 +44,9 @@ class OracleAdapter(SQLAdapter):
     ConnectionManager = OracleAdapterConnectionManager
     Relation = OracleRelation
 
+    def debug_query(self) -> None:
+        self.execute("select 1 as id from dual")
+        
     @classmethod
     def date_function(cls):
         return 'CURRENT_DATE'
@@ -146,6 +149,7 @@ class OracleAdapter(SQLAdapter):
                 _type = self.Relation.get_relation_type(_type)
             except ValueError:
                 _type = self.Relation.External
+                
             relations.append(self.Relation.create(
                 database=_database,
                 schema=_schema,

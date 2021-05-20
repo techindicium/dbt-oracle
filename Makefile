@@ -51,9 +51,9 @@ lint: ## check style with flake8
 	flake8 oracle_dbt tests
 
 test-dbt-project: ## run tests quickly with the default Python
-	cd dbt_test_project && dbt seed --profiles-dir ./
-	cd dbt_test_project && dbt run --profiles-dir ./
-	cd dbt_test_project && dbt test --profiles-dir ./
+	cd dbt_test_project && ORACLE_HOME=./oracle_tns/ dbt seed --profiles-dir ./
+	cd dbt_test_project && ORACLE_HOME=./oracle_tns/ dbt run --profiles-dir ./
+	cd dbt_test_project && ORACLE_HOME=./oracle_tns/ dbt test --profiles-dir ./
 
 test: test-dbt-integration test-dbt-project  ## run tests on every Python version with tox
 	
