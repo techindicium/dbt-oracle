@@ -44,7 +44,10 @@ class OracleAdapterConnectionManager(SQLConnectionManager):
 
     @classmethod
     def _build_host(cls, credentials: Credentials) -> str:
+        
         host = credentials.host
+        if not host:
+            return None
         
         if credentials.port:
             host += f':{credentials.port}'
@@ -55,45 +58,35 @@ class OracleAdapterConnectionManager(SQLConnectionManager):
 
     @classmethod
     def open(cls, connection):
-
         if connection.state == 'open':
             logger.debug('Connection is already open, skipping open.')
             return connection
-
         credentials = cls.get_credentials(connection.credentials)
-
+        host = f'{credentials.host}:{credentials.port}/{credentials.database}'
         try:
-            if credentials.host:
-                host = cls._build_host(credentials=credentials)
-                handle = cx_Oracle.connect(
-                    credentials.user,
-                    credentials.password,
-                    host,
-                    encoding="UTF-8"
-                )
-            else:
-                # Without setting a host, a tnsnames.ora file will be looked up for
-                # connection info
-                handle = cx_Oracle.connect(
-                    credentials.user,
-                    credentials.password, 
-                    credentials.database,
-                    encoding="UTF-8"
-                )
+            host = cls._build_host(credentials=credentials)
+            handle = cx_Oracle.connect( credentials.user, credentials.password, host, encoding="UTF-8")
             connection.handle = handle
             connection.state = 'open'
-            
         except cx_Oracle.DatabaseError as e:
-            logger.info("Got an error when attempting to open an oracle "
-                         "connection: '{}'"
-                         .format(e))
-
-            connection.handle = None
-            connection.state = 'fail'
-
-            raise dbt.exceptions.FailedToConnectException(str(e))
-
-        return connection
+            logger.debug("Got an error when attempting to open an connection to oracle\n"
+                        "using simple string method(host and port)\n"
+                        "Will try to connect using tnsanmes.ora file\n"
+                        "error: '{}'"
+                         .format(str(e)))
+            try:
+                handle = cx_Oracle.connect( credentials.user, credentials.password, credentials.database, encoding="UTF-8")
+                connection.handle = handle
+                connection.state = 'open'
+            except cx_Oracle.DatabaseError as e:
+                 logger.error("Also Got an error when attempting to open an oracle connection\n"
+                             "using tnsnames.ora file, failing dbt job.\n"
+                             "error: '{}'"
+                             .format(str(e)))
+                 connection.handle = None
+                 connection.state = 'fail'
+                 raise dbt.exceptions.FailedToConnectException(str(e))
+        return connection 
 
     @classmethod
     def cancel(self, connection):
