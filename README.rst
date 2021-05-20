@@ -48,18 +48,21 @@ and setting only user and pasword and configuring your ORACLE_HOME environment
 variable so dbt-oracle can find the tnsnames.ora file. Let's assume your tnsnames.ora file
 is placed at 
 
-.. code-block:: sh
-/home/user/oracle/network/admin/tnsnames.ora
+:: 
+ 
+    /home/user/oracle/network/admin/tnsnames.ora
 
 
 you could set 
 
-.. code-block:: sh
-ORACLE_HOME=/home/user/oracle/ 
+:: 
+ 
+    ORACLE_HOME=/home/user/oracle/ 
 
 and your profile:
 
 .. code-block:: yaml
+
     dbt_oracle_test: 
        target: dev
        outputs:
