@@ -124,11 +124,11 @@ You have to either create this user os change the credentias at tests/oracle.dbt
 For running it first start an oracle database instance:
 ::
 
-docker run \
-    --name dbt-oracle-db \
-    -d \
-    -p 1522:1522 \
-    epiclabs/docker-oracle-xe-11g
+    docker run \
+        --name dbt-oracle-db \
+        -d \
+        -p 1522:1522 \
+        epiclabs/docker-oracle-xe-11g
 
 
 Install the project locally
