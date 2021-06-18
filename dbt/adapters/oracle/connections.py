@@ -24,7 +24,7 @@ class OracleAdapterCredentials(Credentials):
     # Default Oracle database port
     port: Port = 1521
     host: Optional[str] = None
-    system: Optional[str] = None
+    service: Optional[str] = None
     connection_string: Optional[str] = None
 
     _ALIASES = {
@@ -38,22 +38,26 @@ class OracleAdapterCredentials(Credentials):
 
     def _connection_keys(self) -> Tuple[str]:
         """
-        List of keys to display in the `dbt debug` output.
+        List of keys to display in the `dbt debug` output. Omit password.
         """
-        return ('database', 'schema', 'host', 'system', 'port', 'user')
+        return (
+            'user', 'database', 'schema',
+            'host', 'port', 'service',
+            'connection_string'
+        )
 
     def connection_method(self) -> str:
         "Return one of: 'TNS', 'host', or 'connection string'"
-        if self.host:
-            return 'host'
-        elif self.connection_string:
+        if self.connection_string:
             return 'connection string'
+        elif self.host:
+            return 'host'
         else:
             return 'TNS'
 
     def get_dsn(self) -> str:
         """Create dsn for cx_Oracle for either any connection method
-        
+
         See https://cx-oracle.readthedocs.io/en/latest/user_guide/connection_handling.html"""
 
         method = self.connection_method()
@@ -61,17 +65,17 @@ class OracleAdapterCredentials(Credentials):
             return self.dbname
         if method == 'connection string':
             return self.connection_string
-        
+
         # Assume 'host' connection method
-    
-        # If the 'system' property is not provided, use 'dbname' property for
+
+        # If the 'service' property is not provided, use 'dbname' property for
         # purposes of connecting.
-        if self.system:
-            system = self.system
+        if self.service:
+            service = self.service
         else:
-            system = self.dbname
-        
-        return f'{self.host}:{self.port}/{system}'
+            service = self.dbname
+
+        return f'{self.host}:{self.port}/{service}'
 
 class OracleAdapterConnectionManager(SQLConnectionManager):
     TYPE = 'oracle'
