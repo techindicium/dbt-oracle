@@ -20,13 +20,15 @@ from dbt.adapters.sql import SQLConnectionManager
 class OracleAdapterCredentials(Credentials):
     user: str
     password: str
-    host: str
-    port: int = 1524
+    # Note: The port won't be used if the host is not provided
+    # Default Oracle database port
+    port: Port = 1521
+    host: Optional[str] = None
     system: Optional[str] = None
-    
+    connection_string: Optional[str] = None
+
     _ALIASES = {
         'dbname': 'database',
-        'sid': 'schema',
         'pass': 'password'
     }
 
@@ -34,46 +36,69 @@ class OracleAdapterCredentials(Credentials):
     def type(self):
         return 'oracle'
 
-    def _connection_keys(self):
+    def _connection_keys(self) -> Tuple[str]:
         """
         List of keys to display in the `dbt debug` output.
         """
         return ('database', 'schema', 'host', 'system', 'port', 'user')
 
+    def connection_method(self) -> str:
+        "Return one of: 'TNS', 'host', or 'connection string'"
+        if self.host:
+            return 'host'
+        elif self.connection_string:
+            return 'connection string'
+        else:
+            return 'TNS'
+
+    def get_dsn(self) -> str:
+        """Create dsn for cx_Oracle for either any connection method
+        
+        See https://cx-oracle.readthedocs.io/en/latest/user_guide/connection_handling.html"""
+
+        method = self.connection_method()
+        if method == 'TNS':
+            return self.dbname
+        if method == 'connection string':
+            return self.connection_string
+        
+        # Assume 'host' connection method
+    
+        # If the 'system' property is not provided, use 'dbname' property for
+        # purposes of connecting.
+        if self.system:
+            system = self.system
+        else:
+            system = self.dbname
+        
+        return f'{self.host}:{self.port}/{system}'
 
 class OracleAdapterConnectionManager(SQLConnectionManager):
     TYPE = 'oracle'
 
     @classmethod
     def open(cls, connection):
-
         if connection.state == 'open':
             logger.debug('Connection is already open, skipping open.')
             return connection
-
         credentials = cls.get_credentials(connection.credentials)
-        # If the 'system' property is not provided, use 'dbname' property
-        if credentials.system is None:
-            system = credentials.dbname
-        else:
-            system = credentials.system
-        connection_string = f'{credentials.host}:{credentials.port}/{system}'
+        method = credentials.connection_method()
+        dsn = credentials.get_dsn()
 
+        logger.debug(f"Attempting to connect using Oracle method: '{method}' "
+                     f"and dsn: '{dsn}'")
         try:
             handle = cx_Oracle.connect(
                 credentials.user,
                 credentials.password,
-                connection_string,
+                dsn,
                 encoding="UTF-8"
             )
-
             connection.handle = handle
             connection.state = 'open'
         except cx_Oracle.DatabaseError as e:
-            logger.info("Got an error when attempting to open an oracle "
-                         "connection: '{}'"
-                         .format(e))
-
+            logger.info(f"Got an error when attempting to open an Oracle "
+                        f"connection: '{e}'")
             connection.handle = None
             connection.state = 'fail'
 
@@ -82,7 +107,7 @@ class OracleAdapterConnectionManager(SQLConnectionManager):
         return connection
 
     @classmethod
-    def cancel(self, connection):
+    def cancel(cls, connection):
         connection_name = connection.name
         oracle_connection = connection.handle
 
