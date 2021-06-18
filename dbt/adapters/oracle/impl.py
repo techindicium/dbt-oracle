@@ -2,6 +2,7 @@ from typing import (
     Optional, List
 )
 
+import dbt.exceptions
 from dbt.adapters.sql import SQLAdapter
 from dbt.adapters.base.meta import available
 from dbt.adapters.oracle import OracleAdapterConnectionManager
@@ -46,7 +47,7 @@ class OracleAdapter(SQLAdapter):
 
     def debug_query(self) -> None:
         self.execute("select 1 as id from dual")
-        
+
     @classmethod
     def date_function(cls):
         return 'CURRENT_DATE'
@@ -108,10 +109,10 @@ class OracleAdapter(SQLAdapter):
         names: List[str]
         if column_names is None:
             columns = self.get_columns_in_relation(relation_a)
-            #names = sorted((self.quote(c.name) for c in columns)
+            # names = sorted((self.quote(c.name) for c in columns)
             names = sorted((c.name for c in columns))
         else:
-            #names = sorted((self.quote(n) for n in column_names))
+            # names = sorted((self.quote(n) for n in column_names))
             names = sorted((n for n in column_names))
         columns_csv = ', '.join(names)
 
@@ -123,7 +124,6 @@ class OracleAdapter(SQLAdapter):
         )
 
         return sql
-
 
     def list_relations_without_caching(
         self, schema_relation: OracleRelation,
@@ -149,7 +149,7 @@ class OracleAdapter(SQLAdapter):
                 _type = self.Relation.get_relation_type(_type)
             except ValueError:
                 _type = self.Relation.External
-                
+
             relations.append(self.Relation.create(
                 database=_database,
                 schema=_schema,
@@ -158,7 +158,6 @@ class OracleAdapter(SQLAdapter):
                 type=_type
             ))
         return relations
-
 
     def timestamp_add_sql(
         self, add_to: str, number: int = 1, interval: str = 'hour'

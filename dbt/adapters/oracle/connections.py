@@ -77,6 +77,7 @@ class OracleAdapterCredentials(Credentials):
 
         return f'{self.host}:{self.port}/{service}'
 
+
 class OracleAdapterConnectionManager(SQLConnectionManager):
     TYPE = 'oracle'
 
