@@ -26,8 +26,15 @@ Installing:
 Configure your profile
 ----------------------
 
-dbt-oracle supports two authentication methods, setting host and port
-like the following example:
+dbt-oracle supports three authentication methods. In any case, one must specifiy ``user``, ``pass``, ``dbname``, and ``schema``
+
+* host: Setting ``host`` (and possibly ``port`` and ``service``, if that differs from ``dbname``)
+* connection string: Setting ``connection_string``
+* TNS: Setting dbname only
+'setting host and port
+
+Host example
+^^^^^^^^^^^^
 
 .. code-block:: yaml
 
@@ -44,9 +51,19 @@ like the following example:
              schema: system
              threads: 4
 
-and setting only user and pasword and configuring your ORACLE_HOME environment
-variable so dbt-oracle can find the tnsnames.ora file. Let's assume your tnsnames.ora file
-is placed at 
+
+If you need to connect via a service name that doesn't match the database name, then you may
+optionally specify ``service`` with the above, e.g.:
+
+.. code-block:: yaml
+ 
+             service: xe_ha.domain.tld
+
+TNS example
+^^^^^^^^^^^
+
+Configuring your ORACLE_HOME environment variable so dbt-oracle can find the tnsnames.ora file.
+Let's assume your tnsnames.ora file is placed at 
 
 :: 
  
@@ -73,6 +90,25 @@ and your profile:
              dbname: xe
              schema: system
              threads: 4
+
+
+Connection string example
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: yaml
+
+    dbt_oracle_test: 
+       target: dev
+       outputs:
+          dev:
+             type: oracle
+             user: system
+             pass: oracle
+             dbname: xe
+             schema: system
+             threads: 4
+             connection_string: "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=xe_ha.domain.tld)))"
+
 
 Supported Features
 ------------------
@@ -106,6 +142,7 @@ Testing & documentation
 
 - Schema tests OK
 - Relationship tests Not OK
+- Data tests Not OK in general -- These work as long as you do not use CTEs in your data tests. One strategy to manage this is to persist a useful CTE as an analysis.
 - SQL Tests OK
 - Docs generate Not OK
 
