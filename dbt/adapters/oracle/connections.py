@@ -1,6 +1,7 @@
 import agate
 from typing import List, Optional, Tuple, Any, Iterable, Dict
 from contextlib import contextmanager
+import enum
 import time
 
 import dbt.exceptions
@@ -16,8 +17,19 @@ from dbt.adapters.base import Credentials
 from dbt.adapters.sql import SQLConnectionManager
 
 
+class OracleConnectionMethod(enum.Enum):
+    HOST = 1
+    TNS = 2
+    CONNECTION_STRING = 3
+
+
 @dataclass
 class OracleAdapterCredentials(Credentials):
+    """Collect Oracle credentials
+
+    An OracleConnectionMethod is inferred from the combination
+    of parameters profiled in the profile.
+    """
     user: str
     password: str
     # Note: The port won't be used if the host is not provided
@@ -46,14 +58,14 @@ class OracleAdapterCredentials(Credentials):
             'connection_string'
         )
 
-    def connection_method(self) -> str:
-        "Return one of: 'TNS', 'host', or 'connection string'"
+    def connection_method(self) -> OracleConnectionMethod:
+        "Return an OracleConnecitonMethod inferred from the configuration"
         if self.connection_string:
-            return 'connection string'
+            return OracleConnectionMethod.CONNECTION_STRING
         elif self.host:
-            return 'host'
+            return OracleConnectionMethod.HOST
         else:
-            return 'TNS'
+            return OracleConnectionMethod.TNS
 
     def get_dsn(self) -> str:
         """Create dsn for cx_Oracle for either any connection method
@@ -61,12 +73,12 @@ class OracleAdapterCredentials(Credentials):
         See https://cx-oracle.readthedocs.io/en/latest/user_guide/connection_handling.html"""
 
         method = self.connection_method()
-        if method == 'TNS':
+        if method == OracleConnectionMethod.TNS:
             return self.dbname
-        if method == 'connection string':
+        if method == OracleConnectionMethod.CONNECTION_STRING:
             return self.connection_string
 
-        # Assume 'host' connection method
+        # Assume host connection method OracleConnectionMethod.HOST
 
         # If the 'service' property is not provided, use 'dbname' property for
         # purposes of connecting.
