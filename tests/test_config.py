@@ -23,74 +23,74 @@ SCENARIOS = {
     "host": {
         "method": OracleConnectionMethod.HOST,
         "profile": """
-default:
-    target: target
-    outputs:
-        target:
-            type: oracle
-            host: localhost
-            user: dbt_test
-            pass: dbt_test
-            database: xe
-            schema: dbt_test
-            port: 1522
-            threads: 1
-""",
-        "dsn": "localhost:1522/xe",
-    },
+            default:
+                target: target
+                outputs:
+                    target:
+                        type: oracle
+                        host: localhost
+                        user: dbt_test
+                        pass: dbt_test
+                        database: xe
+                        schema: dbt_test
+                        port: 1522
+                        threads: 1
+            """,
+                    "dsn": "localhost:1522/xe",
+                },
     "host_service": {
         "method": OracleConnectionMethod.HOST,
         "profile": """
-default:
-    target: target
-    outputs:
-        target:
-            type: oracle
-            host: localhost
-            user: dbt_test
-            pass: dbt_test
-            database: xe
-            service: xe_ha.host.tld
-            schema: dbt_test
-            port: 1522
-            threads: 1        
-""",
+            default:
+                target: target
+                outputs:
+                    target:
+                        type: oracle
+                        host: localhost
+                        user: dbt_test
+                        pass: dbt_test
+                        database: xe
+                        service: xe_ha.host.tld
+                        schema: dbt_test
+                        port: 1522
+                        threads: 1        
+            """,
         "dsn": "localhost:1522/xe_ha.host.tld",
     },
     "tns": {
         "method": OracleConnectionMethod.TNS,
         "profile": """
-default:
-    target: target
-    outputs:
-        target:
-            type: oracle
-            user: dbt_test
-            pass: dbt_test
-            database: xe
-            schema: dbt_test
-            port: 1522
-            threads: 1
-""",
+            default:
+                target: target
+                outputs:
+                    target:
+                        type: oracle
+                        user: dbt_test
+                        pass: dbt_test
+                        database: xe
+                        schema: dbt_test
+                        port: 1522
+                        threads: 1
+            """,
         "dsn": "xe",
     },
     "connection_string": {
         "method": OracleConnectionMethod.CONNECTION_STRING,
         "profile": """
-default:
-    target: target
-    outputs:
-        target:
-            type: oracle
-            host: localhost
-            user: dbt_test
-            pass: dbt_test
-            database: xe
-            connection_string: "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1522))(CONNECT_DATA=(SERVICE_NAME=xe)))"
-            schema: dbt_test
-            port: 1522
-            threads: 1
-""",
+            default:
+                target: target
+                outputs:
+                    target:
+                        type: oracle
+                        host: localhost
+                        user: dbt_test
+                        pass: dbt_test
+                        database: xe
+                        connection_string: "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1522))(CONNECT_DATA=(SERVICE_NAME=xe)))"
+                        schema: dbt_test
+                        port: 1522
+                        threads: 1
+            """,
         "dsn": "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1522))(CONNECT_DATA=(SERVICE_NAME=xe)))",
     },
 }
