@@ -74,18 +74,18 @@ class OracleAdapterCredentials(Credentials):
 
         method = self.connection_method()
         if method == OracleConnectionMethod.TNS:
-            return self.dbname
+            return self.database
         if method == OracleConnectionMethod.CONNECTION_STRING:
             return self.connection_string
 
         # Assume host connection method OracleConnectionMethod.HOST
 
-        # If the 'service' property is not provided, use 'dbname' property for
+        # If the 'service' property is not provided, use 'database' property for
         # purposes of connecting.
         if self.service:
             service = self.service
         else:
-            service = self.dbname
+            service = self.database
 
         return f'{self.host}:{self.port}/{service}'
 
