@@ -21,7 +21,7 @@ Installing:
 
 :: 
  
-    pip install dbt-oracle==0.4.2
+    pip install dbt-oracle==0.4.3
 
 Configure your profile
 ----------------------
@@ -46,7 +46,7 @@ Host example
              host: localhost
              user: system
              pass: oracle
-             port: 1521
+             port: 1522
              dbname: xe
              schema: system
              threads: 4
