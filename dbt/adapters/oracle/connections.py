@@ -1,6 +1,7 @@
 import agate
 from typing import List, Optional, Tuple, Any, Iterable, Dict
 from contextlib import contextmanager
+import enum
 import time
 
 import dbt.exceptions
@@ -16,12 +17,27 @@ from dbt.adapters.base import Credentials
 from dbt.adapters.sql import SQLConnectionManager
 
 
+class OracleConnectionMethod(enum.Enum):
+    HOST = 1
+    TNS = 2
+    CONNECTION_STRING = 3
+
+
 @dataclass
 class OracleAdapterCredentials(Credentials):
+    """Collect Oracle credentials
+
+    An OracleConnectionMethod is inferred from the combination
+    of parameters profiled in the profile.
+    """
     user: str
     password: str
+    # Note: The port won't be used if the host is not provided
+    # Default Oracle database port
+    port: Port = 1521
     host: Optional[str] = None
-    port: Optional[Port] = None
+    service: Optional[str] = None
+    connection_string: Optional[str] = None
 
     _ALIASES = {
         'dbname': 'database',
@@ -32,29 +48,50 @@ class OracleAdapterCredentials(Credentials):
     def type(self):
         return 'oracle'
 
-    def _connection_keys(self):
+    def _connection_keys(self) -> Tuple[str]:
         """
-        List of keys to display in the `dbt info` output.
+        List of keys to display in the `dbt debug` output. Omit password.
         """
-        return ('database', 'schema', 'host', 'port', 'user')
+        return (
+            'user', 'database', 'schema',
+            'host', 'port', 'service',
+            'connection_string'
+        )
+
+    def connection_method(self) -> OracleConnectionMethod:
+        "Return an OracleConnecitonMethod inferred from the configuration"
+        if self.connection_string:
+            return OracleConnectionMethod.CONNECTION_STRING
+        elif self.host:
+            return OracleConnectionMethod.HOST
+        else:
+            return OracleConnectionMethod.TNS
+
+    def get_dsn(self) -> str:
+        """Create dsn for cx_Oracle for either any connection method
+
+        See https://cx-oracle.readthedocs.io/en/latest/user_guide/connection_handling.html"""
+
+        method = self.connection_method()
+        if method == OracleConnectionMethod.TNS:
+            return self.database
+        if method == OracleConnectionMethod.CONNECTION_STRING:
+            return self.connection_string
+
+        # Assume host connection method OracleConnectionMethod.HOST
+
+        # If the 'service' property is not provided, use 'database' property for
+        # purposes of connecting.
+        if self.service:
+            service = self.service
+        else:
+            service = self.database
+
+        return f'{self.host}:{self.port}/{service}'
 
 
 class OracleAdapterConnectionManager(SQLConnectionManager):
     TYPE = 'oracle'
-
-    @classmethod
-    def _build_host(cls, credentials: Credentials) -> str:
-        
-        host = credentials.host
-        if not host:
-            return None
-        
-        if credentials.port:
-            host += f':{credentials.port}'
-        
-        host += f'/{credentials.database}'
-        return host
-
 
     @classmethod
     def open(cls, connection):
@@ -62,34 +99,32 @@ class OracleAdapterConnectionManager(SQLConnectionManager):
             logger.debug('Connection is already open, skipping open.')
             return connection
         credentials = cls.get_credentials(connection.credentials)
-        host = f'{credentials.host}:{credentials.port}/{credentials.database}'
+        method = credentials.connection_method()
+        dsn = credentials.get_dsn()
+
+        logger.debug(f"Attempting to connect using Oracle method: '{method}' "
+                     f"and dsn: '{dsn}'")
         try:
-            host = cls._build_host(credentials=credentials)
-            handle = cx_Oracle.connect( credentials.user, credentials.password, host, encoding="UTF-8")
+            handle = cx_Oracle.connect(
+                credentials.user,
+                credentials.password,
+                dsn,
+                encoding="UTF-8"
+            )
             connection.handle = handle
             connection.state = 'open'
         except cx_Oracle.DatabaseError as e:
-            logger.debug("Got an error when attempting to open an connection to oracle\n"
-                        "using simple string method(host and port)\n"
-                        "Will try to connect using tnsanmes.ora file\n"
-                        "error: '{}'"
-                         .format(str(e)))
-            try:
-                handle = cx_Oracle.connect( credentials.user, credentials.password, credentials.database, encoding="UTF-8")
-                connection.handle = handle
-                connection.state = 'open'
-            except cx_Oracle.DatabaseError as e:
-                 logger.error("Also Got an error when attempting to open an oracle connection\n"
-                             "using tnsnames.ora file, failing dbt job.\n"
-                             "error: '{}'"
-                             .format(str(e)))
-                 connection.handle = None
-                 connection.state = 'fail'
-                 raise dbt.exceptions.FailedToConnectException(str(e))
-        return connection 
+            logger.info(f"Got an error when attempting to open an Oracle "
+                        f"connection: '{e}'")
+            connection.handle = None
+            connection.state = 'fail'
+
+            raise dbt.exceptions.FailedToConnectException(str(e))
+
+        return connection
 
     @classmethod
-    def cancel(self, connection):
+    def cancel(cls, connection):
         connection_name = connection.name
         oracle_connection = connection.handle
 
