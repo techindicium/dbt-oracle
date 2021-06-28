@@ -31,10 +31,10 @@ dbt-oracle supports three authentication methods. In any case, one must specifiy
 * host: Setting ``host`` (and possibly ``port`` and ``service``, if that differs from ``dbname``)
 * connection string: Setting ``connection_string``
 * TNS: Setting dbname only
-'setting host and port
+
 
 Host example
-^^^^^^^^^^^^
+------------
 
 .. code-block:: yaml
 
@@ -60,7 +60,7 @@ optionally specify ``service`` with the above, e.g.:
              service: xe_ha.domain.tld
 
 TNS example
-^^^^^^^^^^^
+-----------
 
 Configuring your ORACLE_HOME environment variable so dbt-oracle can find the tnsnames.ora file.
 Let's assume your tnsnames.ora file is placed at 
@@ -93,7 +93,7 @@ and your profile:
 
 
 Connection string example
-^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------
 
 .. code-block:: yaml
 
@@ -112,6 +112,7 @@ Connection string example
 
 Supported Features
 ------------------
+
 Materilizations
 ###############
 
