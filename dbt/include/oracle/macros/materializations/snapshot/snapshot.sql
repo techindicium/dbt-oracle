@@ -289,3 +289,8 @@
     {%- set result = "TO_TIMESTAMP('"~ timestamp ~ "','yyyy/mm/dd hh24:mi:ss.FF')" -%}
     {{ return(result) }}
 {%- endmacro %}
+
+{% macro oracle__post_snapshot(staging_relation) %}
+  -- Clean up the snapshot temp table
+  {% do drop_relation(staging_relation) %}
+{% endmacro %}
