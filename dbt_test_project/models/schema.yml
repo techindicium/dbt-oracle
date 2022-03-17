@@ -10,7 +10,7 @@ sources:
 models:
   - name: table_relation
     columns:
-      - name: id
+      - name: '"id"'
         tests:
           - not_null
           - unique

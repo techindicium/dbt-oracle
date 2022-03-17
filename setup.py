@@ -54,6 +54,7 @@ setup(
         'dbt': [
             'include/oracle/dbt_project.yml',
             'include/oracle/macros/*.sql',
+            'include/oracle/macros/**/*.sql',
             'include/oracle/macros/**/**/*.sql'
         ]
     }
