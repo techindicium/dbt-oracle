@@ -36,11 +36,9 @@ from validation_errors
 
 {% endmacro %}
 
-{% macro oracle__test_not_null(model) %}
+{% macro oracle__test_not_null(model, column_name) %}
 
-{% set column_name = kwargs.get('column_name', kwargs.get('arg')) %}
-
-select count(*)
+select {{ column_name }}
 from {{ model.include(False, True, True) }}
 where {{ column_name }} is null
 
