@@ -11,14 +11,14 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 requirements = [
-        'dbt-core~=0.19.0',
-        'cx_Oracle==7.3.0'
+        'dbt-core~=1.0.0',
+        'cx_Oracle==8.3.0'
 ]
 
 setup_requirements = []
 
 test_requirements = [
-    'pytest-dbt-adapter==0.4.0'
+    'pytest-dbt-adapter==0.6.0'
 ]
 
 setup(
@@ -48,7 +48,7 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/techindicium/dbt-oracle',
-    version='0.4.3',
+    version='0.5.0',
     zip_safe=False,
     package_data={
         'dbt': [
