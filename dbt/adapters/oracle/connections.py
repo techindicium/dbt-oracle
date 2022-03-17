@@ -15,7 +15,7 @@ from dbt.helper_types import Port
 
 from dbt.adapters.base import Credentials
 from dbt.adapters.sql import SQLConnectionManager
-
+from dbt.contracts.connection import AdapterResponse
 
 class OracleConnectionMethod(enum.Enum):
     HOST = 1
@@ -139,13 +139,8 @@ class OracleAdapterConnectionManager(SQLConnectionManager):
         logger.info("Canceled query '{}'".format(connection_name))
 
     @classmethod
-    def get_status(cls, cursor):
-        # Do oracle cx has something for this? could not find it
-        return 'OK'
-
-    @classmethod
     def get_response(cls, cursor):
-        return 'OK'
+        return AdapterResponse('OK')
 
     @contextmanager
     def exception_handler(self, sql):
@@ -211,7 +206,7 @@ class OracleAdapterConnectionManager(SQLConnectionManager):
             connection.handle.commit()
             logger.debug(
                 "SQL status: {status} in {elapsed:0.2f} seconds",
-                status=self.get_status(cursor),
+                status=self.get_response(cursor),
                 elapsed=(time.time() - pre)
             )
 
