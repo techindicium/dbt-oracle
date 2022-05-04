@@ -1,4 +1,12 @@
 ==========
+ ⚠️ This repo is archived!
+==========
+
+Oracle are now the maintainers of the adapter for Oracle db. The repo can be found here: https://github.com/oracle/dbt-oracle
+
+For further questions please ask in the [#db-oracle channel](https://getdbt.slack.com/archives/C01PWH4TXLY) on the [dbt community slack](https://www.getdbt.com/community/join-the-community/)
+
+==========
 Oracle DBT
 ==========
 
